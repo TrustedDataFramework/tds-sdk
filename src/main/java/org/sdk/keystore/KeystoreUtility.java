@@ -1,7 +1,5 @@
 package org.sdk.keystore;
 
-import org.apache.commons.codec.binary.Hex;
-import org.sdk.apiResult.APIResult;
 import org.tdf.common.util.HexBytes;
 import org.tdf.crypto.PrivateKey;
 import org.tdf.crypto.PublicKey;
@@ -12,8 +10,6 @@ import org.tdf.sunflower.state.Address;
 
 
 public class KeystoreUtility {
-
-
     public static KeyStoreImpl generateKeyStore(String password) {
         return SMKeystore.generateKeyStore(password);
     }

@@ -1,18 +1,12 @@
 package org.sdk.transaction;
 
-import org.sdk.apiResult.APIResult;
 import org.sdk.transaction.contract.User;
-import org.sdk.util.ByteUtil;
 import org.tdf.common.util.HexBytes;
 import org.tdf.common.util.LittleEndian;
-import org.tdf.crypto.PrivateKey;
-import org.tdf.crypto.sm2.SM2PrivateKey;
-import org.tdf.rlp.RLP;
 import org.tdf.rlp.RLPCodec;
-import org.tdf.rlp.RLPDecoder;
+import org.tdf.sunflower.state.Address;
+import org.tdf.sunflower.types.CryptoContext;
 import org.tdf.sunflower.types.Transaction;
-
-import java.util.Date;
 
 public class TransactionUtility {
 
@@ -24,14 +18,29 @@ public class TransactionUtility {
     public static final int BLOCK_VERSION = LittleEndian.decodeInt32(new byte[]{0, 'p', 'o', 'a'});
     public static final int TRANSACTION_VERSION = LittleEndian.decodeInt32(new byte[]{0, 'p', 'o', 'a'});
 
-    public static Object CreateUserTransaction(Long nonce, String from, String address, String username, int role, String org, int orgType,String privatekey) {
-        User user = new User(HexBytes.fromHex(address),username,role,org,orgType);
-        Transaction transaction = new Transaction(Transaction.Type.CONTRACT_DEPLOY.code, TRANSACTION_VERSION,new Date().getTime(), nonce, HexBytes.fromHex(from) , 0L, 0L, HexBytes.fromBytes(ByteUtil.merge(new byte[]{0x00}, user.RLPdeserialization())), ROOT_USER_ADDRESS, ZERO_BYTES);
-        PrivateKey sm2PrivateKey = new SM2PrivateKey(HexBytes.fromHex(privatekey).getBytes());
-        transaction.setSignature(HexBytes.fromBytes(sm2PrivateKey.sign(transaction.getSignaturePlain())));
-        return APIResult.newSuccess(HexBytes.fromBytes(RLPCodec.encode(transaction)).toHex(),transaction.getHash().toHex());
+    private enum UserMethod {
+        SAVE, UPDATE, DELETE, CHANGE_OWNER
     }
 
+    public static Transaction saveUser(long nonce, HexBytes privateKey, String username, int role, String org, int orgType) {
+        byte[] pk = CryptoContext.getPkFromSk(privateKey.getBytes());
+        HexBytes address = Address.fromPublicKey(pk);
+        User user = new User(address, username, role, org, orgType);
+        HexBytes prefix = HexBytes.fromBytes(new byte[]{(byte) UserMethod.SAVE.ordinal()});
 
-
+        Transaction transaction = new Transaction(
+                Transaction.Type.CONTRACT_CALL.code,
+                TRANSACTION_VERSION, System.currentTimeMillis() / 1000
+                ,
+                nonce,
+                HexBytes.fromBytes(pk),
+                0L,
+                0L,
+                prefix.concat(HexBytes.fromBytes(RLPCodec.encode(user))),
+                USER_STATE_ADDRESS,
+                ZERO_BYTES);
+        byte[] sig = CryptoContext.sign(privateKey.getBytes(), transaction.getSignaturePlain());
+        transaction.setSignature(HexBytes.fromBytes(sig));
+        return transaction;
+    }
 }

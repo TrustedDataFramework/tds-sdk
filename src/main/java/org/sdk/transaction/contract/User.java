@@ -64,23 +64,4 @@ public class User {
      */
     @RLP(4)
     private int orgType;
-
-    public User RLPdeserialization(byte[] payload) {
-        try{
-            User User= RLPCodec.decode(payload,User.class);
-            this.address=address;
-            this.org=org;
-            this.orgType=orgType;
-            this.username=username;
-            this.role=role;
-            return User;
-        }catch (Exception e){
-            throw e;
-        }
-    }
-    public byte[] RLPdeserialization() {
-        return RLPElement.readRLPTree(this).getEncoded();
-    }
-
-
 }
