@@ -71,7 +71,7 @@ Class.forName("org.sdk.util.Init")
           accessory:int type(流程序号)，String accessoryName(附件名称)，HexBytes accessoryHash(附件哈希)
     返回值：Transaction（Object）
     
-    *注:type=0时，accessory 传null。type=1时，groupHash传null。
+    *注:type=0时，accessory 传 null。type=1时，groupHash传null。
     ```
     + 更新附件
     ```java
