@@ -32,6 +32,12 @@ dependencies {
     compileOnly "org.projectlombok:lombok:1.18.10"
     annotationProcessor "org.projectlombok:lombok:1.18.10"
     implementation 'com.github.TrustedDataFramework:java-rlp:1.1.20'
-// https://mvnrepository.com/artifact/com.google.guava/guava
-//    compile group: 'com.google.guava', name: 'guava', version: '28.1-jre'
+    // https://mvnrepository.com/artifact/com.google.guava/guava
+    compile group: 'com.google.guava', name: 'guava', version: '28.1-jre'
+    compile "com.fasterxml.jackson.dataformat:jackson-dataformat-properties:2.10.0"
+    compile "com.fasterxml.jackson.core:jackson-databind:2.10.0"
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.6'
+    compile group: 'org.apache.httpcomponents', name: 'httpcore', version: '4.4.11'
+    compile group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.5.2'
+
 }

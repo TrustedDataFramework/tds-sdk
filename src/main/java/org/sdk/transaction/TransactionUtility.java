@@ -1,6 +1,11 @@
 package org.sdk.transaction;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.sdk.keystore.KeystoreUtility;
+import org.sdk.transaction.contract.Accessory;
 import org.sdk.transaction.contract.User;
+import org.sdk.transaction.contract.WeldPayload;
 import org.tdf.common.util.HexBytes;
 import org.tdf.common.util.LittleEndian;
 import org.tdf.rlp.RLPCodec;
@@ -22,22 +27,198 @@ public class TransactionUtility {
         SAVE, UPDATE, DELETE, CHANGE_OWNER
     }
 
-    public static Transaction saveUser(long nonce, HexBytes privateKey, String username, int role, String org, int orgType) {
+    private enum Method {
+        SAVE, UPDATE
+    }
+
+    public static Transaction saveUser(long nonce, HexBytes privateKey, String address, String username, int role, String org, int orgType) {
         byte[] pk = CryptoContext.getPkFromSk(privateKey.getBytes());
-        HexBytes address = Address.fromPublicKey(pk);
-        User user = new User(address, username, role, org, orgType);
+        User user = new User(HexBytes.fromHex(address), username, role, org, orgType);
         HexBytes prefix = HexBytes.fromBytes(new byte[]{(byte) UserMethod.SAVE.ordinal()});
 
         Transaction transaction = new Transaction(
+                TRANSACTION_VERSION,
                 Transaction.Type.CONTRACT_CALL.code,
-                TRANSACTION_VERSION, System.currentTimeMillis() / 1000
-                ,
-                nonce,
+                System.currentTimeMillis() / 1000,
+                ++nonce,
                 HexBytes.fromBytes(pk),
                 0L,
                 0L,
                 prefix.concat(HexBytes.fromBytes(RLPCodec.encode(user))),
                 USER_STATE_ADDRESS,
+                ZERO_BYTES);
+        byte[] sig = CryptoContext.sign(privateKey.getBytes(), transaction.getSignaturePlain());
+        transaction.setSignature(HexBytes.fromBytes(sig));
+        return transaction;
+    }
+
+    public static Transaction updateUser(long nonce, HexBytes privateKey, String address, String username, int role, String org, int orgType) {
+        byte[] pk = CryptoContext.getPkFromSk(privateKey.getBytes());
+        User user = new User(HexBytes.fromHex(address), username, role, org, orgType);
+        HexBytes prefix = HexBytes.fromBytes(new byte[]{(byte) UserMethod.UPDATE.ordinal()});
+
+        Transaction transaction = new Transaction(
+                TRANSACTION_VERSION,
+                Transaction.Type.CONTRACT_CALL.code,
+                System.currentTimeMillis() / 1000,
+                ++nonce,
+                HexBytes.fromBytes(pk),
+                0L,
+                0L,
+                prefix.concat(HexBytes.fromBytes(RLPCodec.encode(user))),
+                USER_STATE_ADDRESS,
+                ZERO_BYTES);
+        byte[] sig = CryptoContext.sign(privateKey.getBytes(), transaction.getSignaturePlain());
+        transaction.setSignature(HexBytes.fromBytes(sig));
+        return transaction;
+    }
+
+    public static Transaction deleteUser(long nonce, HexBytes privateKey, String address) {
+        byte[] pk = CryptoContext.getPkFromSk(privateKey.getBytes());
+        HexBytes prefix = HexBytes.fromBytes(new byte[]{(byte) UserMethod.DELETE.ordinal()});
+
+        Transaction transaction = new Transaction(
+                TRANSACTION_VERSION,
+                Transaction.Type.CONTRACT_CALL.code,
+                System.currentTimeMillis() / 1000,
+                ++nonce,
+                HexBytes.fromBytes(pk),
+                0L,
+                0L,
+                prefix.concat(HexBytes.fromHex(address)),
+                USER_STATE_ADDRESS,
+                ZERO_BYTES);
+        byte[] sig = CryptoContext.sign(privateKey.getBytes(), transaction.getSignaturePlain());
+        transaction.setSignature(HexBytes.fromBytes(sig));
+        return transaction;
+    }
+
+    public static Transaction changeOwnerUser(long nonce, HexBytes privateKey, String address) {
+        byte[] pk = CryptoContext.getPkFromSk(privateKey.getBytes());
+        HexBytes prefix = HexBytes.fromBytes(new byte[]{(byte) UserMethod.CHANGE_OWNER.ordinal()});
+
+        Transaction transaction = new Transaction(
+                TRANSACTION_VERSION,
+                Transaction.Type.CONTRACT_CALL.code,
+                System.currentTimeMillis() / 1000,
+                ++nonce,
+                HexBytes.fromBytes(pk),
+                0L,
+                0L,
+                prefix.concat(HexBytes.fromHex(address)),
+                USER_STATE_ADDRESS,
+                ZERO_BYTES);
+        byte[] sig = CryptoContext.sign(privateKey.getBytes(), transaction.getSignaturePlain());
+        transaction.setSignature(HexBytes.fromBytes(sig));
+        return transaction;
+    }
+
+    public static Transaction saveWeld(long nonce, HexBytes privateKey, String wpqr, HexBytes groupHash, int type, Accessory accessory) {
+        byte[] pk = CryptoContext.getPkFromSk(privateKey.getBytes());
+        HexBytes address = Address.fromPublicKey(pk);
+        HexBytes prefix = HexBytes.fromBytes(new byte[]{(byte) Method.SAVE.ordinal()});
+        WeldPayload weldPayload = new WeldPayload(
+                wpqr,
+                type,
+                groupHash,
+                accessory);
+
+        Transaction transaction = new Transaction(
+                TRANSACTION_VERSION,
+                Transaction.Type.CONTRACT_CALL.code,
+                System.currentTimeMillis() / 1000,
+                ++nonce,
+                HexBytes.fromBytes(pk),
+                0L,
+                0L,
+                prefix.concat(HexBytes.fromBytes(RLPCodec.encode(weldPayload))),
+                WELD_STATE_ADDRESS,
+                ZERO_BYTES);
+        byte[] sig = CryptoContext.sign(privateKey.getBytes(), transaction.getSignaturePlain());
+        transaction.setSignature(HexBytes.fromBytes(sig));
+        return transaction;
+    }
+
+    public static Transaction updateWeld(long nonce, HexBytes privateKey, String wpqr, HexBytes groupHash) {
+        byte[] pk = CryptoContext.getPkFromSk(privateKey.getBytes());
+        HexBytes address = Address.fromPublicKey(pk);
+        HexBytes prefix = HexBytes.fromBytes(new byte[]{(byte) Method.UPDATE.ordinal()});
+        WeldPayload weldPayload = new WeldPayload(
+                wpqr,
+                0,
+                groupHash,
+                null);
+
+        Transaction transaction = new Transaction(
+                TRANSACTION_VERSION,
+                Transaction.Type.CONTRACT_CALL.code,
+                System.currentTimeMillis() / 1000,
+                ++nonce,
+                HexBytes.fromBytes(pk),
+                0L,
+                0L,
+                prefix.concat(HexBytes.fromBytes(RLPCodec.encode(weldPayload))),
+                WELD_STATE_ADDRESS,
+                ZERO_BYTES);
+        byte[] sig = CryptoContext.sign(privateKey.getBytes(), transaction.getSignaturePlain());
+        transaction.setSignature(HexBytes.fromBytes(sig));
+        return transaction;
+    }
+
+    public static Transaction saveAccessory(long nonce, HexBytes privateKey, String wpqr, int type, String accessoryName, HexBytes accessoryHash) {
+        byte[] pk = CryptoContext.getPkFromSk(privateKey.getBytes());
+        HexBytes address = Address.fromPublicKey(pk);
+        HexBytes prefix = HexBytes.fromBytes(new byte[]{(byte) Method.SAVE.ordinal()});
+        Accessory accessory = new Accessory(
+                type,
+                accessoryName,
+                accessoryHash);
+        WeldPayload weldPayload = new WeldPayload(
+                wpqr,
+                1,
+                ZERO_BYTES,
+                accessory);
+
+        Transaction transaction = new Transaction(
+                TRANSACTION_VERSION,
+                Transaction.Type.CONTRACT_CALL.code,
+                System.currentTimeMillis() / 1000,
+                ++nonce,
+                HexBytes.fromBytes(pk),
+                0L,
+                0L,
+                prefix.concat(HexBytes.fromBytes(RLPCodec.encode(weldPayload))),
+                WELD_STATE_ADDRESS,
+                ZERO_BYTES);
+        byte[] sig = CryptoContext.sign(privateKey.getBytes(), transaction.getSignaturePlain());
+        transaction.setSignature(HexBytes.fromBytes(sig));
+        return transaction;
+    }
+
+    public static Transaction updateAccessory(long nonce, HexBytes privateKey, String wpqr, int type, String accessoryName, HexBytes accessoryHash) {
+        byte[] pk = CryptoContext.getPkFromSk(privateKey.getBytes());
+        HexBytes address = Address.fromPublicKey(pk);
+        HexBytes prefix = HexBytes.fromBytes(new byte[]{(byte) Method.UPDATE.ordinal()});
+        Accessory accessory = new Accessory(
+                type,
+                accessoryName,
+                accessoryHash);
+        WeldPayload weldPayload = new WeldPayload(
+                wpqr,
+                1,
+                null,
+                accessory);
+
+        Transaction transaction = new Transaction(
+                TRANSACTION_VERSION,
+                Transaction.Type.CONTRACT_CALL.code,
+                System.currentTimeMillis() / 1000,
+                ++nonce,
+                HexBytes.fromBytes(pk),
+                0L,
+                0L,
+                prefix.concat(HexBytes.fromBytes(RLPCodec.encode(weldPayload))),
+                WELD_STATE_ADDRESS,
                 ZERO_BYTES);
         byte[] sig = CryptoContext.sign(privateKey.getBytes(), transaction.getSignaturePlain());
         transaction.setSignature(HexBytes.fromBytes(sig));

@@ -18,13 +18,13 @@ public class KeystoreUtility {
         return HexBytes.fromBytes(SMKeystore.decryptKeyStore(keyStore, password)).toHex();
     }
 
-    public String privateKeyToPublicKey(String privateKey) {
+    public static String privateKeyToPublicKey(String privateKey) {
         PrivateKey sm2PrivateKey = new SM2PrivateKey(HexBytes.fromHex(privateKey).getBytes());
         PublicKey publicKey = sm2PrivateKey.generatePublicKey();
         return HexBytes.fromBytes(publicKey.getEncoded()).toHex();
     }
 
-    public String publicKeyToAddress(String publicKey){
+    public static String publicKeyToAddress(String publicKey){
         return Address.fromPublicKey(HexBytes.fromHex(publicKey)).toHex();
     }
 
