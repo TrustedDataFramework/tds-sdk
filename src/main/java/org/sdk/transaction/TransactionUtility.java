@@ -52,27 +52,6 @@ public class TransactionUtility {
         return transaction;
     }
 
-    public static Transaction updateUser(long nonce, HexBytes privateKey, String address, String username, int role, String org, int orgType) {
-        byte[] pk = CryptoContext.getPkFromSk(privateKey.getBytes());
-        User user = new User(HexBytes.fromHex(address), username, role, org, orgType);
-        HexBytes prefix = HexBytes.fromBytes(new byte[]{(byte) UserMethod.UPDATE.ordinal()});
-
-        Transaction transaction = new Transaction(
-                TRANSACTION_VERSION,
-                Transaction.Type.CONTRACT_CALL.code,
-                System.currentTimeMillis() / 1000,
-                ++nonce,
-                HexBytes.fromBytes(pk),
-                0L,
-                0L,
-                prefix.concat(HexBytes.fromBytes(RLPCodec.encode(user))),
-                USER_STATE_ADDRESS,
-                ZERO_BYTES);
-        byte[] sig = CryptoContext.sign(privateKey.getBytes(), transaction.getSignaturePlain());
-        transaction.setSignature(HexBytes.fromBytes(sig));
-        return transaction;
-    }
-
     public static Transaction deleteUser(long nonce, HexBytes privateKey, String address) {
         byte[] pk = CryptoContext.getPkFromSk(privateKey.getBytes());
         HexBytes prefix = HexBytes.fromBytes(new byte[]{(byte) UserMethod.DELETE.ordinal()});

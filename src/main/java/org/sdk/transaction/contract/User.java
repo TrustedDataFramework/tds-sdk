@@ -24,10 +24,6 @@ public class User {
         return ValidateResult.success();
     }
 
-    public enum Method {
-        SAVE, UPDATE, DELETE, CHANGE_OWNER
-    }
-
     /**
      * 用户 keystore 地址
      */
