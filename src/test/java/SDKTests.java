@@ -1,14 +1,24 @@
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.sdk.keystore.KeystoreUtility;
 import org.sdk.transaction.TransactionUtility;
 import org.sdk.util.HttpclientUtil;
 import org.tdf.common.util.HexBytes;
+import org.tdf.crypto.AES256CTR;
+import org.tdf.crypto.keystore.KeyStoreImpl;
+import org.tdf.crypto.keystore.SMKeystore;
 import org.tdf.sunflower.types.CryptoContext;
 import org.tdf.sunflower.types.Transaction;
+
+import java.nio.charset.StandardCharsets;
 
 @RunWith(JUnit4.class)
 public class SDKTests {
@@ -48,5 +58,14 @@ public class SDKTests {
         HttpclientUtil.httpPostBody("http://192.168.1.167:7010/rpc/transaction",appleNode);
     }
 
+    @Test
+    public void keystore() throws JsonProcessingException {
+        KeyStoreImpl keyJson = SMKeystore.generateKeyStore("123456", HexBytes.decode("626cb1df7c489a09243ecb4d7f12ffad61cd1b7863331ac7de7364810616e14a"));
+        String json = MAPPER.writeValueAsString(keyJson);
+        System.out.println(json);
+        KeyStoreImpl ks = MAPPER.readValue(json, KeyStoreImpl.class);
+        String privateKey = KeystoreUtility.decryptKeyStore(ks, "123456");
+        System.out.println(privateKey);
+    }
 
 }
