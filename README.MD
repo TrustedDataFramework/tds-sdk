@@ -1,5 +1,6 @@
 ## tds sdk
 
+* dependencies:https://scans.gradle.com/s/22zpxxnvn343c/dependencies?focusedDependencyView=details&toggled=W1swXSxbMCwxXV0
 ```java
 Class.forName("org.sdk.util.Init")
 ```
