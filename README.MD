@@ -1,7 +1,14 @@
 ## tds sdk
 
-* dependencies:https://scans.gradle.com/s/22zpxxnvn343c/dependencies?focusedDependencyView=details&toggled=W1swXSxbMCwxXV0, The local jar is in release。
+dependencies:
+
+https://scans.gradle.com/s/22zpxxnvn343c/dependencies?focusedDependencyView=details&toggled=W1swXSxbMCwxXV0
+
+The local jar is in release。
+
 ```java
+Class.forName("org.sdk.util.Init")
+``````java
 Class.forName("org.sdk.util.Init")
 ```
 + Keystore
