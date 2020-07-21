@@ -6,8 +6,6 @@ https://scans.gradle.com/s/22zpxxnvn343c/dependencies?focusedDependencyView=deta
 
 The local jar is in release。
 
-```java
-Class.forName("org.sdk.util.Init")
 ``````java
 Class.forName("org.sdk.util.Init")
 ```
