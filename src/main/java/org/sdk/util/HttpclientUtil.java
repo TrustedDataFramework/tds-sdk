@@ -1,7 +1,5 @@
 package org.sdk.util;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpEntity;
@@ -37,8 +35,8 @@ public class HttpclientUtil {
             URLConnection conn = realUrl.openConnection();
             // 设置通用的请求属性
             conn.setRequestProperty("accept", "*/*");
-            conn.setConnectTimeout(3000);
-            conn.setReadTimeout(3000);
+            conn.setConnectTimeout(30000);
+            conn.setReadTimeout(30000);
             conn.setRequestProperty("connection", "Keep-Alive");
             conn.setRequestProperty("user-agent",
                     "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
@@ -61,11 +59,7 @@ public class HttpclientUtil {
         } catch (Exception e) {
 //            System.out.println("发送 POST 请求出现异常！"+e);
 //            e.printStackTrace();
-            JSONObject jo = new JSONObject();
-            jo.put("message", "Connection refused");
-            jo.put("data", "");
-            jo.put("code", "5000");
-            return jo.toJSONString();
+           e.printStackTrace();
         }
         //使用finally块来关闭输出流、输入流
         finally {
@@ -114,11 +108,7 @@ public class HttpclientUtil {
         } catch (Exception e) {
 //            System.out.println("发送GET请求出现异常！" + e);
 //            e.printStackTrace();
-            JSONObject jo = new JSONObject();
-            jo.put("message", "Connection refused");
-            jo.put("data", "");
-            jo.put("code", "5000");
-            return jo.toJSONString();
+            e.printStackTrace();
         }
         // 使用finally块来关闭输入流
         finally {
