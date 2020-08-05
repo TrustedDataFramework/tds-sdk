@@ -9,6 +9,9 @@ version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    maven {
+        url 'http://120.76.101.153:8081/repository/maven-public'
+    }
 }
 
 allprojects {
@@ -19,8 +22,12 @@ allprojects {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile fileTree(dir:'libs',include:['*.jar'])
     compile "org.bouncycastle:bcprov-jdk15on:1.61"
+
+    compile "org.tdf:common:1.0.0"
+    compile "org.tdf:crypto:1.0.0"
+    compile "org.tdf:facade:1.0.0"
+
     implementation "commons-codec:commons-codec:1.13"
     testCompile "commons-codec:commons-codec:1.13"
     compile "commons-cli:commons-cli:1.4"
