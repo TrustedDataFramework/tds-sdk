@@ -26,7 +26,7 @@ dependencies {
 
     compile "org.tdf:common:1.0.0"
     compile "org.tdf:crypto:1.0.0"
-    compile "org.tdf:facade:1.0.0"
+    compile "org.tdf:facade:1.0.1"
 
     implementation "commons-codec:commons-codec:1.13"
     testCompile "commons-codec:commons-codec:1.13"
