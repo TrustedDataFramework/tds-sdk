@@ -24,9 +24,9 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile "org.bouncycastle:bcprov-jdk15on:1.61"
 
-    compile "org.tdf:common:1.0.0"
-    compile "org.tdf:crypto:1.0.0"
-    compile "org.tdf:facade:1.0.1"
+    compile "org.tdf:common:1.0.2"
+    compile "org.tdf:crypto:1.0.2"
+    compile "org.tdf:facade:1.0.2"
 
     implementation "commons-codec:commons-codec:1.13"
     testCompile "commons-codec:commons-codec:1.13"
